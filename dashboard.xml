@@ -1,0 +1,493 @@
+<form>
+  <label>Frozen Buckets</label>
+  <fieldset submitButton="false">
+    <input type="time" token="time1">
+      <label></label>
+      <default>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </default>
+    </input>
+    <input type="dropdown" token="host">
+      <label>host</label>
+      <choice value="*">ALL</choice>
+      <fieldForLabel>splunk_indexer</fieldForLabel>
+      <fieldForValue>splunk_indexer</fieldForValue>
+      <search>
+        <query>index="_internal" sourcetype="isilon:bucket"
+| stats count by splunk_indexer</query>
+        <earliest>-24h@h</earliest>
+        <latest>now</latest>
+      </search>
+      <default>*</default>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Total isilon Buckets</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| stats count by sourcetype
+| fields - sourcetype</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[10000,40000,80000,100000]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Total isilon Buckets</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>No of Index</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| stats dc(index_name) by sourcetype
+| fields - sourcetype</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[30,40,50,60]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">No of Index</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Total Usage in GB</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| eval size_mb=round(size/1024, 2)
+| eval size_gb=round(size_mb/1024, 2)
+| stats sum(size_gb) as size_gb by sourcetype
+| fields - sourcetype</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x0877a6","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[200,300,400,500]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Total Usage in GB</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Size by Index in GB</title>
+      <chart>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| eval size_mb=round(size/1024, 2)
+| eval size_gb=round(size_mb/1024, 2)
+| stats sum(size_gb) as "Total Size in GB" by index_name
+| sort -"Total Size in GB"
+| head 10</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+    <panel>
+      <title>Bucket Count by Index</title>
+      <chart>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| eval size_mb=round(size/1024, 2)
+| eval size_gb=round(size_mb/1024, 2)
+| stats count as Buckets by index_name
+| sort -Buckets
+| head 10</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="charting.axisLabelsX.majorLabelStyle.overflowMode">ellipsisNone</option>
+        <option name="charting.axisLabelsX.majorLabelStyle.rotation">0</option>
+        <option name="charting.axisTitleX.visibility">visible</option>
+        <option name="charting.axisTitleY.visibility">visible</option>
+        <option name="charting.axisTitleY2.visibility">visible</option>
+        <option name="charting.axisX.abbreviation">none</option>
+        <option name="charting.axisX.scale">linear</option>
+        <option name="charting.axisY.abbreviation">none</option>
+        <option name="charting.axisY.scale">linear</option>
+        <option name="charting.axisY2.abbreviation">none</option>
+        <option name="charting.axisY2.enabled">0</option>
+        <option name="charting.axisY2.scale">inherit</option>
+        <option name="charting.chart">bar</option>
+        <option name="charting.chart.bubbleMaximumSize">50</option>
+        <option name="charting.chart.bubbleMinimumSize">10</option>
+        <option name="charting.chart.bubbleSizeBy">area</option>
+        <option name="charting.chart.nullValueMode">gaps</option>
+        <option name="charting.chart.showDataLabels">none</option>
+        <option name="charting.chart.sliceCollapsingThreshold">0.01</option>
+        <option name="charting.chart.stackMode">default</option>
+        <option name="charting.chart.style">shiny</option>
+        <option name="charting.drilldown">none</option>
+        <option name="charting.layout.splitSeries">0</option>
+        <option name="charting.layout.splitSeries.allowIndependentYRanges">0</option>
+        <option name="charting.legend.labelStyle.overflowMode">ellipsisMiddle</option>
+        <option name="charting.legend.mode">standard</option>
+        <option name="charting.legend.placement">right</option>
+        <option name="charting.lineWidth">2</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </chart>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <input type="dropdown" token="index_name">
+        <label>Index Name</label>
+        <fieldForLabel>index_name</fieldForLabel>
+        <fieldForValue>index_name</fieldForValue>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$
+| stats count by index_name
+| fields - count</query>
+          <earliest>-7d@h</earliest>
+          <latest>now</latest>
+        </search>
+        <choice value="*">All Index</choice>
+      </input>
+      <input type="text" token="start_time">
+        <label>Start Time: ("MM/DD/YYY")</label>
+      </input>
+      <input type="text" token="end_time">
+        <label>End Time: ("MM/DD/YYY")</label>
+      </input>
+      <input type="dropdown" token="bucket_type">
+        <label>Bucket Type</label>
+        <choice value="*">All</choice>
+        <choice value="rb">rb</choice>
+        <choice value="db">db</choice>
+      </input>
+      <input type="text" token="mb_time" searchWhenChanged="true">
+        <label>Time Calculation (MB/Sec)</label>
+      </input>
+      <html>
+      <u1> </u1>
+    </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Epoch starting Time</title>
+      <single>
+        <search>
+          <query>| gentimes start=-1 | eval YourDate="00:00:00 AM $start_time$" | table YourDate 
+| eval epoch1=strptime(YourDate,"%H:%M:%S %p %m/%d/%Y") 
+| convert timeformat="%H:%M:%S %p %m/%d/%Y" mktime(YourDate) as "Epoch Starting Time"
+| table "Epoch Starting Time"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[10]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Epoch Starting Time</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+        <drilldown>
+          <set token="start_time_drop">$click.value$</set>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <title>Epoch Ending Time</title>
+      <single>
+        <search>
+          <query>| gentimes start=-1 | eval YourDate="00:00:00 AM $end_time$" | table YourDate 
+| eval epoch1=strptime(YourDate,"%H:%M:%S %p %m/%d/%Y") 
+| convert timeformat="%H:%M:%S %p %m/%d/%Y" mktime(YourDate) as "Epoch Ending Time"
+| table "Epoch Ending Time"</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">all</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0xdc4e41","0x53a051"]</option>
+        <option name="rangeValues">[10]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Epoch Ending Time</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">0</option>
+        <drilldown>
+          <set token="end_time_drop">$click.value$</set>
+        </drilldown>
+      </single>
+    </panel>
+    <panel>
+      <title>Total buckets</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where start_time &gt;= $end_time_drop$ AND start_time &lt;= $start_time_drop$
+| append [ search index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where end_time &gt;= $end_time_drop$ AND end_time &lt;= $start_time_drop$]
+| dedup bucket_name
+| stats count as "Total Buckets" by index_name
+| fields - index_name</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0</option>
+        <option name="rangeColors">["0x53a051","0x006d9c","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1000,2000,3000,4000]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Total bucket</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Total Size in GB</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where start_time &gt;= $end_time_drop$ AND start_time &lt;= $start_time_drop$
+| append [ search index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where end_time &gt;= $end_time_drop$ AND end_time &lt;= $start_time_drop$]
+| dedup bucket_name
+| stats sum(size_gb) as "Total Size" by index_name
+| fields - index_name</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.00</option>
+        <option name="rangeColors">["0x53a051","0x006d9c","0xf8be34","0xf1813f","0xdc4e41"]</option>
+        <option name="rangeValues">[1000,2000,3000,4000]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Total bucket</option>
+        <option name="unit">GB</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+    <panel>
+      <title>Time Calculation</title>
+      <single>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where start_time &gt;= $end_time_drop$ AND start_time &lt;= $start_time_drop$
+| append [ search index="_internal" sourcetype="isilon:bucket" 
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 3)
+| eval size_gb=round(size_mb/1024, 3)
+| where end_time &gt;= $end_time_drop$ AND end_time &lt;= $start_time_drop$]
+| dedup bucket_name
+| stats sum(size_mb) as size_mb by index_name
+| eval Time_sec=round((size_mb/$mb_time$)/60, 3)
+| fields - index_name size_mb</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="colorBy">value</option>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="numberPrecision">0.0</option>
+        <option name="rangeColors">["0x53a051","0x53a051"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="showSparkline">1</option>
+        <option name="showTrendIndicator">1</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+        <option name="trendColorInterpretation">standard</option>
+        <option name="trendDisplayMode">absolute</option>
+        <option name="underLabel">Minutes</option>
+        <option name="unitPosition">after</option>
+        <option name="useColors">1</option>
+        <option name="useThousandSeparators">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Check List</title>
+      <table>
+        <search>
+          <query>index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 4)
+| eval size_gb=round(size_mb/1024, 4)
+| where start_time &gt;= $end_time_drop$ AND start_time &lt;= $start_time_drop$
+| append [ search index="_internal" sourcetype="isilon:bucket"
+| search splunk_indexer=$host$ AND bucket_type=$bucket_type$ AND index_name=$index_name$
+| eval size_mb=round(size/1024, 4)
+| eval size_gb=round(size_mb/1024, 4)
+| where end_time &gt;= $end_time_drop$ AND end_time &lt;= $start_time_drop$]
+| dedup bucket_name
+|fieldformat start_time=strftime(start_time, "%m/%d/%Y %H:%M:%S")
+|fieldformat end_time=strftime(end_time, "%m/%d/%Y %H:%M:%S")
+| stats count values(size_gb) as Size_GB values(bucket_no) as Bucket_Number values(end_time) as end_time by start_time index_name bucket_name bucket_type splunk_indexer
+| table start_time, end_time, splunk_indexer, index_name, bucket_name, bucket_type, Bucket_Number, Size_GB, count</query>
+          <earliest>$time1.earliest$</earliest>
+          <latest>$time1.latest$</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>
